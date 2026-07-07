@@ -1,7 +1,8 @@
 # Saga Pattern — Transacciones distribuidas con compensación manual
 
 > Demo standalone de un patrón de arquitectura backend. Código Java/Spring Boot
-> real y simplificado, pensado para leerse, no para ejecutarse.
+> real y simplificado, pensado para leerse y también **ejecutable** de forma
+> autónoma (ver [Cómo ejecutar](#cómo-ejecutar)).
 
 ## Contexto de uso real
 
@@ -43,6 +44,21 @@ Decisiones de diseño que la demo transmite:
   pattern matching exhaustivo en un `switch` sin `default`, de modo que añadir un
   nuevo estado de pago obliga a tratarlo en tiempo de compilación.
 
+## Cómo ejecutar
+
+Esta demo es un proyecto Maven autónomo (Java 21 / Spring Boot 3.x). Desde esta
+carpeta:
+
+```bash
+mvn spring-boot:run   # ejecuta la demo y muestra el flujo completo por consola
+mvn test              # corre los tests
+```
+
+Al arrancar, `SagaDemoApplication` lanza dos checkouts seguidos: uno que **completa
+con éxito** y otro que **falla en `confirm-shipment`** (transportista caído) para
+mostrar la **compensación en cascada** — reembolso del cobro y liberación del stock
+en orden inverso. Cada escenario imprime su rastro de estado paso a paso.
+
 ## Cómo navegar el código
 
 Lee los ficheros en este orden:
@@ -59,6 +75,8 @@ Lee los ficheros en este orden:
    se lanza la saga.
 6. **`SagaStateRepository.java`** / **`SagaStepRecord.java`** / **`StepStatus.java`**
    — el rastro de estado persistido (aquí en memoria, en producción una tabla).
+7. **`SagaDemoApplication.java`** — punto de entrada ejecutable: un
+   `CommandLineRunner` lanza los dos escenarios (éxito y compensación) al arrancar.
 
 > **Nota de simplificación**: la reserva de stock usaría en la implementación real
 > un *lock pesimista* a nivel de base de datos (`SELECT ... FOR UPDATE`) para

@@ -7,14 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Third step: hand the order to the shipping carrier.
- *
- * <p>This is the most likely <em>late</em> failure in a checkout: stock is
- * already reserved and the card already charged when the carrier rejects the
- * shipment. When that happens the orchestrator compensates in reverse — refund
- * the charge, then release the stock — which is exactly the scenario this demo
- * exists to show. The {@code carrierAvailable} guard simulates that downstream
- * failure deterministically.
+ * Tercer paso: entregar el pedido al transportista. Es el fallo tardío que dispara
+ * la compensación de la demo; el guard carrierAvailable lo simula de forma
+ * determinista.
  */
 @Component
 public class ConfirmShipmentStep implements SagaStep {
@@ -27,8 +22,8 @@ public class ConfirmShipmentStep implements SagaStep {
         this(true);
     }
 
-    /** Test/demo constructor to force the carrier-down branch. */
-    ConfirmShipmentStep(boolean carrierAvailable) {
+    /** Constructor para test/demo que fuerza la rama de transportista caído. */
+    public ConfirmShipmentStep(boolean carrierAvailable) {
         this.carrierAvailable = carrierAvailable;
     }
 

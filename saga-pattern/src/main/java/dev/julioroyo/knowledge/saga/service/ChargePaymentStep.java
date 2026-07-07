@@ -13,11 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Second step: charge the customer through an external gateway.
- *
- * <p>Shows the {@link PaymentResult} sealed interface consumed with exhaustive
- * pattern matching: the {@code switch} has no {@code default}, so adding a new
- * payment outcome later forces this code to be revisited at compile time.
+ * Segundo paso: cobrar al cliente a través de una pasarela externa. Consume la
+ * sealed interface PaymentResult con un switch exhaustivo (sin default), de modo
+ * que un nuevo resultado de pago obliga a tratarlo en tiempo de compilación.
  */
 @Component
 public class ChargePaymentStep implements SagaStep {
@@ -51,16 +49,12 @@ public class ChargePaymentStep implements SagaStep {
 
     @Override
     public void compensate(SagaContext context) {
-        // Only refund if a charge actually went through.
+        // Reembolsa solo si un cobro llegó a realizarse.
         context.find("transactionId").ifPresent(transactionId ->
                 log.info("Refunding transaction {} for order {}", transactionId, context.order().id()));
     }
 
-    /**
-     * Stand-in for the real gateway call. Returns a successful capture; the other
-     * {@link PaymentResult} branches above document how declines and pending
-     * settlements would be handled.
-     */
+    /** Sustituto de la llamada real a la pasarela; devuelve una captura exitosa. */
     private PaymentResult charge(Order order) {
         return new PaymentSuccess("tx-" + UUID.randomUUID(), order.amount());
     }

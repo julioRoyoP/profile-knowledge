@@ -4,18 +4,16 @@ import dev.julioroyo.knowledge.payment.model.PaymentRequest;
 import dev.julioroyo.knowledge.payment.model.PaymentResult;
 
 /**
- * The seam: the contract every payment provider must satisfy.
- *
- * <p>Consumers ({@link PaymentService}) depend only on this interface — the
- * dependency-inversion principle in practice. Adding a new provider means adding
- * one implementation; no consumer code changes.
+ * Contrato que todo proveedor de pago debe satisfacer. Es la frontera de la
+ * que dependen los consumidores; añadir un proveedor es añadir una
+ * implementación, sin tocar el código que cobra.
  */
 public interface PaymentGateway {
 
     /**
-     * Stable provider key (e.g. {@code "stripe"}) used to select this gateway at
-     * runtime. Matches the Spring bean name so the gateways can be wired into a
-     * {@code Map<String, PaymentGateway>}.
+     * Clave estable del proveedor (por ejemplo "stripe") para seleccionar este
+     * gateway en tiempo de ejecución. Coincide con el nombre del bean de Spring
+     * para poder cablearlos en un Map<String, PaymentGateway>.
      */
     String provider();
 

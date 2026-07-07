@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Proyecto Maven independiente para la demo security-jwt-keycloak. Cada demo
+      de este repositorio es autónoma (sin pom padre compartido) para poder
+      compilarse y ejecutarse por sí sola, como un microservicio independiente.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>dev.julioroyo.knowledge</groupId>
+    <artifactId>security-jwt-keycloak</artifactId>
+    <version>1.0.0</version>
+    <name>security-jwt-keycloak</name>
+    <description>OAuth2 Resource Server: JWT validation and role mapping from an external IdP (Keycloak)</description>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- API REST protegida (controllers, filtros de Spring Security). A
+             diferencia de las otras demos, esta sí es una app web: recibe
+             peticiones HTTP con bearer token. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- OAuth2 Resource Server: valida el JWT (firma, emisor, expiración)
+             contra el JWK del IdP y expone el token como principal. Es el núcleo
+             del patrón. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- Lombok: @Slf4j genera el logger en SecurityConfig y ProductController.
+             Requiere annotation processing activado (Maven lo hace solo; en el IDE
+             hay que habilitarlo). -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Aporta JUnit 5, Mockito y AssertJ, de los que depende el
+             JwtRoleConverterTest existente. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Habilita `mvn spring-boot:run` para lanzar la demo. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

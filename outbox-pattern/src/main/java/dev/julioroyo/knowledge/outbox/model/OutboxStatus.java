@@ -1,20 +1,17 @@
 package dev.julioroyo.knowledge.outbox.model;
 
 /**
- * Lifecycle of an outbox event.
- *
- * <p>The {@code PROCESSING} state is the key to <em>not</em> sending the same
- * notification twice: the relay atomically moves an event from {@code PENDING}
- * to {@code PROCESSING} before dispatching it, so a second scheduler tick (or a
- * second instance) skips events already claimed by another in-flight attempt.
+ * Ciclo de vida de un evento outbox. El estado PROCESSING evita enviar la misma
+ * notificación dos veces: el relay reclama el evento moviéndolo a PROCESSING antes
+ * de despacharlo, de modo que otro tick o instancia se salta los ya reclamados.
  */
 public enum OutboxStatus {
-    /** Persisted, waiting to be picked up by the relay. */
+    /** Persistido, esperando a que el relay lo recoja. */
     PENDING,
-    /** Claimed by a relay run and currently being dispatched. */
+    /** Reclamado por una ejecución del relay y despachándose en este momento. */
     PROCESSING,
-    /** Successfully delivered; terminal. */
+    /** Entregado con éxito; terminal. */
     SENT,
-    /** Exhausted the retry budget; terminal, needs manual or dead-letter handling. */
+    /** Agotado el presupuesto de reintentos; terminal, requiere tratamiento manual o dead-letter. */
     FAILED
 }

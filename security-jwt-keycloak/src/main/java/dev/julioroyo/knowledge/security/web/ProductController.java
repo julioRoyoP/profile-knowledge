@@ -1,6 +1,7 @@
 package dev.julioroyo.knowledge.security.web;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,15 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Tiny controller showing the rules from {@code SecurityConfig} in practice and
- * how to read the validated token. The endpoints are illustrative stubs — the
- * point is the access boundary, not the business logic.
- *
- * <ul>
- *   <li>{@code GET  /api/products} — public (permitAll).</li>
- *   <li>{@code POST /api/products} — requires {@code ROLE_ADMIN}.</li>
- * </ul>
+ * Controller mínimo que muestra en la práctica las reglas de SecurityConfig y
+ * cómo leer el token ya validado. GET /api/products es público; POST
+ * /api/products exige ROLE_ADMIN. Los endpoints son ilustrativos: importa el
+ * límite de acceso, no la lógica de negocio.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -29,8 +27,9 @@ public class ProductController {
 
     @PostMapping
     public String create(@AuthenticationPrincipal Jwt jwt) {
-        // The Jwt is the validated token; claims are read straight from it.
+        // El Jwt es el token validado; los claims se leen directamente de él.
         String username = jwt.getClaimAsString("preferred_username");
+        log.info("Producto creado por {}", username);
         return "product created by " + username;
     }
 }

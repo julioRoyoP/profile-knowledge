@@ -20,10 +20,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Verifies the strategy/registry wiring: the service routes to the gateway that
- * matches the provider key and leaves the others untouched, and it fails loudly
- * when asked for a provider that was never registered. The gateways are mocked,
- * so the test only exercises the selection logic, not any provider integration.
+ * Verifica el cableado registry/strategy: el servicio enruta al gateway cuya
+ * clave coincide con el proveedor y deja intactos los demás, y falla de forma
+ * evidente si se pide un proveedor no registrado. Los gateways están mockeados,
+ * así que solo se ejercita la lógica de selección, no la integración concreta.
  */
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
@@ -35,7 +35,7 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Mirrors the Map<String, PaymentGateway> Spring would inject, keyed by bean name.
+        // Refleja el Map<String, PaymentGateway> que inyectaría Spring, con clave el nombre del bean.
         service = new PaymentService(Map.of("stripe", stripe, "mock", mock));
     }
 
@@ -53,7 +53,7 @@ class PaymentServiceTest {
 
     @Test
     void shouldRouteRefundToTheSelectedGateway() {
-        PaymentResult expected = new PaymentSuccess("tx-9", null);
+        PaymentResult expected = new PaymentSuccess("tx-9", BigDecimal.ZERO);
         when(mock.refundPayment("tx-9")).thenReturn(expected);
 
         PaymentResult result = service.refund("mock", "tx-9");

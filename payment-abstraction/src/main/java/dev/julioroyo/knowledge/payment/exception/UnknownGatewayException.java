@@ -2,7 +2,7 @@ package dev.julioroyo.knowledge.payment.exception;
 
 import java.util.Set;
 
-/** Raised when a payment is requested for a provider key with no registered gateway. */
+/** Se lanza cuando se pide un pago para una clave de proveedor sin gateway registrado. */
 public class UnknownGatewayException extends RuntimeException {
 
     public UnknownGatewayException(String provider, Set<String> available) {

@@ -11,13 +11,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
- * Maps Keycloak's role model onto Spring Security authorities.
- *
- * <p>Keycloak does not put roles where Spring's defaults look ({@code scope} /
- * {@code scp}); it nests realm roles under {@code realm_access.roles}. This
- * converter reaches into that claim and turns each role into a
- * {@code ROLE_}-prefixed {@link GrantedAuthority}, so {@code hasRole(...)} in
- * {@link SecurityConfig} works as expected.
+ * Traduce el modelo de roles de Keycloak a authorities de Spring Security.
+ * Keycloak anida los roles de realm bajo el claim realm_access.roles, donde
+ * Spring no los busca por defecto; este converter los extrae y les antepone el
+ * prefijo ROLE_ para que hasRole(...) funcione en SecurityConfig.
  */
 public class JwtRoleConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 

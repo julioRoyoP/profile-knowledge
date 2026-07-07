@@ -3,22 +3,21 @@ package dev.julioroyo.knowledge.payment.service;
 import dev.julioroyo.knowledge.payment.model.PaymentRequest;
 import dev.julioroyo.knowledge.payment.model.PaymentResult;
 import dev.julioroyo.knowledge.payment.model.PaymentResult.PaymentFailure;
+import dev.julioroyo.knowledge.payment.model.PaymentResult.PaymentPending;
 import dev.julioroyo.knowledge.payment.model.PaymentResult.PaymentSuccess;
 import java.math.BigDecimal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Second example implementation, present mainly to make the abstraction's payoff
- * visible: the same {@link PaymentGateway} contract admits a completely different
- * provider with no consumer change. Handy as a deterministic gateway for local
- * runs and tests — it approves any positive amount and declines the rest.
+ * Segunda implementación del mismo contrato PaymentGateway, para hacer visible
+ * que un proveedor completamente distinto encaja sin cambiar al consumidor.
+ * Es determinista: el resultado depende del importe y del transactionId, lo
+ * que la hace útil como gateway de pruebas y para escenificar cada resultado.
  */
+@Slf4j
 @Component("mock")
 public class MockPaymentGateway implements PaymentGateway {
-
-    private static final Logger log = LoggerFactory.getLogger(MockPaymentGateway.class);
 
     @Override
     public String provider() {
@@ -35,11 +34,25 @@ public class MockPaymentGateway implements PaymentGateway {
 
     @Override
     public PaymentResult refundPayment(String transactionId) {
-        return new PaymentSuccess(transactionId, null);
+        log.info("[mock] refunding {}", transactionId);
+        return resolveByTransactionId(transactionId);
     }
 
     @Override
     public PaymentResult getPaymentStatus(String transactionId) {
-        return new PaymentSuccess(transactionId, null);
+        log.info("[mock] status of {}", transactionId);
+        return resolveByTransactionId(transactionId);
+    }
+
+    // Variación determinista según el transactionId, para poder escenificar cada
+    // resultado: "fail" -> fallo, "pending" -> pendiente, resto -> éxito.
+    private PaymentResult resolveByTransactionId(String transactionId) {
+        if (transactionId == null || transactionId.contains("fail")) {
+            return new PaymentFailure("transaction not found or not refundable");
+        }
+        if (transactionId.contains("pending")) {
+            return new PaymentPending(transactionId);
+        }
+        return new PaymentSuccess(transactionId, BigDecimal.ZERO);
     }
 }

@@ -1,17 +1,14 @@
 package dev.julioroyo.knowledge.outbox.model;
 
 import java.time.Instant;
+import lombok.Getter;
 
 /**
- * One pending side effect, persisted in the same local transaction as the
- * business change that produced it.
- *
- * <p>Modeled here as a mutable entity (not a record) because its status, attempt
- * count and next-attempt time evolve as the relay retries it — exactly what a
- * JPA {@code @Entity} would hold. A real entity would carry {@code @Id},
- * {@code @Version} (optimistic lock) and column mappings; those are omitted to
- * keep the focus on the pattern.
+ * Un efecto secundario pendiente, persistido en la misma transacción local que el
+ * cambio de negocio que lo produjo. Es mutable (no un record) porque su estado,
+ * intentos y hora de próximo intento evolucionan a medida que el relay lo reintenta.
  */
+@Getter
 public class OutboxEvent {
 
     private final String id;
@@ -28,31 +25,7 @@ public class OutboxEvent {
         this.payload = payload;
     }
 
-    public String id() {
-        return id;
-    }
-
-    public String type() {
-        return type;
-    }
-
-    public String payload() {
-        return payload;
-    }
-
-    public OutboxStatus status() {
-        return status;
-    }
-
-    public int attempts() {
-        return attempts;
-    }
-
-    public Instant nextAttemptAt() {
-        return nextAttemptAt;
-    }
-
-    /** Atomically claim this event for an in-flight dispatch. */
+    /** Reclama atómicamente este evento para un dispatch en curso. */
     public void markProcessing() {
         this.status = OutboxStatus.PROCESSING;
     }
@@ -62,8 +35,8 @@ public class OutboxEvent {
     }
 
     /**
-     * Record a failed attempt: increment the counter and schedule the next try
-     * with exponential backoff, or give up once the budget is exhausted.
+     * Registra un intento fallido: incrementa el contador y programa el siguiente
+     * intento con backoff exponencial, o se rinde una vez agotado el presupuesto.
      */
     public void markRetry(int maxAttempts, Instant nextAttemptAt) {
         this.attempts++;

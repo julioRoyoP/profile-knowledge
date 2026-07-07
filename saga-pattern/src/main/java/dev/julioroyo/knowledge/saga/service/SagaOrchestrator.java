@@ -12,23 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Heart of the demo: runs an ordered list of {@link SagaStep}s and guarantees
- * that if any step fails, every step that already succeeded is compensated in
- * reverse order — the manual-compensation alternative to a distributed 2PC
- * transaction.
- *
- * <h2>Why a saga and not 2PC?</h2>
- * The steps touch independent systems (inventory, payment gateway, shipping)
- * that do not share a transaction manager and cannot be enrolled in a single
- * XA/two-phase commit. A saga trades atomicity for <em>eventual</em>
- * consistency: each step commits locally and publishes a compensating action,
- * so a late failure unwinds the earlier successes instead of locking three
- * external systems for the duration of the whole checkout.
- *
- * <h2>Why a {@link Deque}?</h2>
- * Successful steps are pushed onto a stack as they complete, so compensation
- * naturally pops them in LIFO order — you always undo the most recent effect
- * first (refund the charge before releasing the stock it paid for).
+ * Corazón de la demo: ejecuta una lista ordenada de pasos (SagaStep) y, si alguno
+ * falla, compensa en orden inverso los pasos ya completados. Es la alternativa de
+ * compensación manual a una transacción distribuida 2PC. Los pasos exitosos se
+ * apilan en un Deque para deshacerlos en orden LIFO.
  */
 @Service
 public class SagaOrchestrator {
@@ -42,9 +29,8 @@ public class SagaOrchestrator {
     }
 
     /**
-     * Executes the steps in order. On the first failure, compensates the
-     * already-completed steps in reverse and rethrows as a
-     * {@link SagaExecutionException}.
+     * Ejecuta los pasos en orden. Ante el primer fallo, compensa los pasos ya
+     * completados en orden inverso y relanza como SagaExecutionException.
      */
     public void execute(String sagaId, List<SagaStep> steps, SagaContext context) {
         Deque<SagaStep> executed = new ArrayDeque<>();
@@ -67,11 +53,9 @@ public class SagaOrchestrator {
     }
 
     /**
-     * Unwinds completed steps newest-first. A failing compensation is logged and
-     * recorded but does <em>not</em> abort the remaining rollback — a stuck
-     * compensation must not strand the other steps in a half-undone state; it is
-     * surfaced via {@link StepStatus#COMPENSATION_FAILED} for an operator or a
-     * retry job to pick up.
+     * Deshace los pasos completados empezando por el más reciente. Una compensación
+     * que falla se registra como COMPENSATION_FAILED pero no aborta el resto del
+     * rollback.
      */
     private void compensate(String sagaId, Deque<SagaStep> executed, SagaContext context) {
         while (!executed.isEmpty()) {

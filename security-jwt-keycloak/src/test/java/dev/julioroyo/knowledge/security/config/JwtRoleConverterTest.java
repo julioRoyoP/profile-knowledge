@@ -11,10 +11,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
- * Checks the one piece of custom security logic: pulling Keycloak's nested
- * {@code realm_access.roles} claim out and turning it into {@code ROLE_}-prefixed
- * authorities, including the case where the claim is absent. A real
- * {@link Jwt} is built by hand — no Spring context or identity provider needed.
+ * Cubre la única lógica de seguridad propia: extraer el claim anidado
+ * realm_access.roles de Keycloak y convertirlo en authorities con prefijo ROLE_,
+ * incluido el caso en que el claim no existe. El Jwt se construye a mano, sin
+ * contexto de Spring ni IdP.
  */
 class JwtRoleConverterTest {
 

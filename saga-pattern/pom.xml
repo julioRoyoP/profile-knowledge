@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Proyecto Maven independiente para la demo saga-pattern. Cada demo de este
+      repositorio es autónoma (sin pom padre compartido) para poder compilarse y
+      ejecutarse por sí sola, como un microservicio independiente.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>dev.julioroyo.knowledge</groupId>
+    <artifactId>saga-pattern</artifactId>
+    <version>1.0.0</version>
+    <name>saga-pattern</name>
+    <description>Distributed transactions with manual compensation (Saga pattern)</description>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Contexto core de Spring (@Service, @Component, @Repository) más el
+             puente de logging del starter (SLF4J API + Logback), que es todo lo
+             que usa el código de la demo. Sin starters web/data: es una demo de
+             consola. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Aporta JUnit 5, Mockito (+ mockito-junit-jupiter) y AssertJ, de los
+             que depende el SagaOrchestratorTest existente. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Habilita `mvn spring-boot:run` para lanzar la demo. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,19 +1,18 @@
 package dev.julioroyo.knowledge.outbox.service;
 
 import dev.julioroyo.knowledge.outbox.model.OutboxEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Example {@link NotificationSender} that just logs the delivery. Keeps the demo
- * self-contained: no SMTP, no provider SDK, no credentials. A real
- * implementation would wrap {@code JavaMailSender}, an SMS gateway, etc.
+ * NotificationSender de ejemplo que se limita a loguear la entrega.
+ * Mantiene la demo autocontenida: sin SMTP, sin SDK de proveedor, sin
+ * credenciales. Una implementación real envolvería JavaMailSender, una
+ * pasarela de SMS, etc.
  */
+@Slf4j
 @Component
 public class LoggingNotificationSender implements NotificationSender {
-
-    private static final Logger log = LoggerFactory.getLogger(LoggingNotificationSender.class);
 
     @Override
     public void send(OutboxEvent event) {

@@ -17,10 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Drives the dispatcher through the three delivery outcomes that define the
- * pattern: a clean send, a transient failure that is retried and then succeeds,
- * and a permanent failure that exhausts the retry budget. The external channel
- * is mocked so failures can be simulated deterministically.
+ * Lleva al dispatcher por los tres resultados de entrega que definen el patrón:
+ * un envío limpio, un fallo transitorio que se reintenta y luego tiene éxito, y un
+ * fallo permanente que agota el presupuesto de reintentos. El canal externo se
+ * mockea para poder simular los fallos de forma determinista.
  */
 @ExtendWith(MockitoExtension.class)
 class OutboxDispatcherTest {
@@ -50,12 +50,12 @@ class OutboxDispatcherTest {
     @Test
     void shouldRescheduleForRetryWhenDeliveryFailsAndSucceedOnNextAttempt() {
         OutboxEvent event = repository.save(new OutboxEvent("e2", "ORDER_CONFIRMED", "{}"));
-        // First attempt fails (flaky provider), second one goes through.
+        // El primer intento falla (proveedor inestable), el segundo pasa.
         doThrow(new RuntimeException("smtp timeout")).doNothing().when(sender).send(event);
 
         dispatcher.dispatch(event);
 
-        // Back to PENDING with a backed-off next attempt instead of being lost.
+        // Vuelve a PENDING con un próximo intento con backoff en lugar de perderse.
         assertThat(event.status()).isEqualTo(OutboxStatus.PENDING);
         assertThat(event.attempts()).isEqualTo(1);
         assertThat(event.nextAttemptAt()).isAfter(Instant.now());
@@ -71,7 +71,7 @@ class OutboxDispatcherTest {
         OutboxEvent event = repository.save(new OutboxEvent("e3", "ORDER_CONFIRMED", "{}"));
         doThrow(new RuntimeException("provider down")).when(sender).send(event);
 
-        // Five attempts is the configured budget; the fifth flips it to terminal FAILED.
+        // Cinco intentos es el presupuesto configurado; el quinto lo pasa a FAILED terminal.
         for (int attempt = 0; attempt < 5; attempt++) {
             dispatcher.dispatch(event);
         }

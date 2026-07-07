@@ -1,0 +1,16 @@
+# Punto de conexión con el IdP externo. El Resource Server descarga el JWK de
+# este issuer al arrancar para validar la firma de cada JWT. Con un Keycloak
+# local en el realm demo-realm el valor por defecto funciona; en otro entorno se
+# sobreescribe con la variable KEYCLOAK_ISSUER_URI. Sin un IdP accesible la app
+# no arranca: es la dependencia externa del patrón.
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/demo-realm}
+
+# Patrón de log compacto, en línea con el resto de demos del repositorio.
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{0} - %msg%n"

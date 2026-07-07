@@ -3,26 +3,18 @@ package dev.julioroyo.knowledge.outbox.service;
 import dev.julioroyo.knowledge.outbox.model.OutboxEvent;
 import dev.julioroyo.knowledge.outbox.repository.OutboxRepository;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Producer side — the reason the outbox exists.
- *
- * <p>Confirming the order and writing the outbox event happen in the <em>same
- * local transaction</em>. That is the whole point: either both commit or neither
- * does, so the notification can never be lost (event written but order rolled
- * back) nor sent for a phantom order (notification fired but order rolled back).
- * The actual delivery is deliberately left out of this transaction and handled
- * later by {@link OutboxRelay}, so a slow or flaky email provider can never
- * block or roll back the business operation.
+ * Lado productor del outbox: confirma el pedido y escribe el evento outbox en la
+ * misma transacción local, de modo que o se confirman ambos o ninguno. La entrega
+ * real queda fuera de esta transacción, a cargo de OutboxRelay.
  */
+@Slf4j
 @Service
 public class OrderConfirmationService {
-
-    private static final Logger log = LoggerFactory.getLogger(OrderConfirmationService.class);
 
     private final OutboxRepository outbox;
 
@@ -32,7 +24,7 @@ public class OrderConfirmationService {
 
     @Transactional
     public void confirmOrder(String orderId) {
-        // ... persist the order state change here, in this same transaction ...
+        // ... aquí se persistiría el cambio de estado del pedido, en esta misma transacción ...
 
         OutboxEvent event = new OutboxEvent(
                 UUID.randomUUID().toString(),

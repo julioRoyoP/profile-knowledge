@@ -24,10 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Exercises the core guarantee of the saga: forward execution on the happy path,
- * and reverse-order compensation when a step fails. The steps are mocked so the
- * test focuses purely on the orchestration logic, not on any step's business
- * effect.
+ * Ejercita la garantía central de la saga: ejecución forward en el camino feliz,
+ * y compensación en orden inverso cuando un paso falla. Los pasos se mockean para
+ * que el test se centre puramente en la lógica de orquestación, no en el efecto
+ * de negocio de cada paso.
  */
 @ExtendWith(MockitoExtension.class)
 class SagaOrchestratorTest {
@@ -78,11 +78,11 @@ class SagaOrchestratorTest {
                 .extracting(e -> ((SagaExecutionException) e).failedStep())
                 .isEqualTo("confirm-shipment");
 
-        // Already-completed steps unwind newest-first: payment before stock.
+        // Los pasos ya completados se deshacen del más reciente al más antiguo: pago antes que stock.
         InOrder inOrder = inOrder(reserveStock, chargePayment);
         inOrder.verify(chargePayment).compensate(context);
         inOrder.verify(reserveStock).compensate(context);
-        // The step that failed mid-execute never completed, so it is not compensated.
+        // El paso que falló a mitad de execute nunca se completó, así que no se compensa.
         verify(confirmShipment, never()).compensate(context);
     }
 
@@ -95,7 +95,7 @@ class SagaOrchestratorTest {
                 orchestrator.execute("saga-partial", List.of(reserveStock, chargePayment, confirmShipment), context))
                 .isInstanceOf(SagaExecutionException.class);
 
-        // A failing compensation must not strand the earlier step: stock is still released.
+        // Una compensación que falla no debe dejar colgado el paso anterior: el stock igualmente se libera.
         verify(reserveStock).compensate(context);
         assertThat(stateRepository.history("saga-partial"))
                 .extracting(SagaStepRecord::status)

@@ -5,27 +5,21 @@ import dev.julioroyo.knowledge.payment.model.PaymentRequest;
 import dev.julioroyo.knowledge.payment.model.PaymentResult;
 import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Consumer of the abstraction. It never names a concrete provider: it picks one
- * by key from the {@code Map<String, PaymentGateway>} that Spring builds
- * automatically — every {@link PaymentGateway} bean keyed by its bean name.
- *
- * <p>This is the same registry/strategy wiring used in the real system: adding a
- * provider is just adding a {@code @Component} implementation; this class does
- * not change.
+ * Consumidor de la abstracción. Nunca nombra un proveedor concreto: elige uno
+ * por clave del Map<String, PaymentGateway> que Spring construye con un bean
+ * por cada PaymentGateway. Añadir un proveedor no cambia esta clase.
  */
+@Slf4j
 @Service
 public class PaymentService {
 
-    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
-
     private final Map<String, PaymentGateway> gateways;
 
-    /** Spring injects one entry per {@link PaymentGateway} bean, keyed by bean name. */
+    /** Spring inyecta una entrada por cada bean PaymentGateway, con clave el nombre del bean. */
     public PaymentService(Map<String, PaymentGateway> gateways) {
         this.gateways = gateways;
         log.info("Payment gateways registered: {}", gateways.keySet());
@@ -37,6 +31,10 @@ public class PaymentService {
 
     public PaymentResult refund(String provider, String transactionId) {
         return gatewayFor(provider).refundPayment(transactionId);
+    }
+
+    public PaymentResult status(String provider, String transactionId) {
+        return gatewayFor(provider).getPaymentStatus(transactionId);
     }
 
     private PaymentGateway gatewayFor(String provider) {

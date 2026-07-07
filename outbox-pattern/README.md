@@ -1,7 +1,8 @@
 # Outbox Pattern — Efectos secundarios asíncronos con consistencia eventual
 
 > Demo standalone de un patrón de arquitectura backend. Código Java/Spring Boot
-> real y simplificado, pensado para leerse, no para ejecutarse.
+> real y simplificado, pensado para leerse y también **ejecutable** de forma
+> autónoma (ver [Cómo ejecutar](#cómo-ejecutar)).
 
 ## Contexto de uso real
 
@@ -46,6 +47,24 @@ Decisiones de diseño que la demo transmite:
   no crítico que tolera latencia; por eso es asíncrona. La consistencia inmediata
   (confirmar el pedido) permanece síncrona y transaccional.
 
+## Cómo ejecutar
+
+Esta demo es un proyecto Maven autónomo (Java 21 / Spring Boot 3.x). Desde esta
+carpeta:
+
+```bash
+mvn spring-boot:run   # ejecuta la demo y muestra el flujo completo por consola
+mvn test              # corre los tests
+```
+
+Al arrancar, `OutboxDemoApplication` confirma un pedido de ejemplo (que **encola**
+un evento en el outbox) y deja correr el relay `@Scheduled`, que lo reclama y lo
+entrega de forma asíncrona (`@Async`) vía `LoggingNotificationSender`. En consola
+se ve el ciclo completo **`PENDING → PROCESSING → SENT`**; cuando el evento llega
+a estado terminal, la demo termina sola. (El reintento con backoff no se escenifica
+en el runner para no alargarlo —el backoff base es de 10s—; queda cubierto por los
+tests.)
+
 ## Cómo navegar el código
 
 Lee los ficheros en este orden:
@@ -61,6 +80,9 @@ Lee los ficheros en este orden:
    contrato del canal externo y un stub que solo loggea (sin SMTP).
 6. **`OutboxRepository.java`** — el almacén (aquí en memoria; en producción la
    tabla outbox con claim atómico).
+7. **`OutboxDemoApplication.java`** — punto de entrada ejecutable: activa el
+   scheduling y el async, confirma un pedido de ejemplo y muestra el ciclo de
+   entrega por consola.
 
 > **Nota de simplificación**: no hay plantillas de email, configuración SMTP ni
 > proveedor real — `LoggingNotificationSender` representa el canal externo. El

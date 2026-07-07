@@ -3,25 +3,21 @@ package dev.julioroyo.knowledge.payment.model;
 import java.math.BigDecimal;
 
 /**
- * Typed outcome of a payment operation, shared by every payment gateway
- * implementation.
- *
- * <p>Same modeling idea as the saga demo: a sealed interface so every caller
- * handles each outcome exhaustively, with no stringly-typed "unknown status".
- * Keeping the contract's return type abstract (this interface) rather than a
- * provider-specific response is what makes gateways truly interchangeable.
+ * Resultado tipado de una operación de pago, común a todas las
+ * implementaciones de gateway. Es una sealed interface para que cada
+ * llamador trate todos los casos de forma exhaustiva.
  */
 public sealed interface PaymentResult
         permits PaymentResult.PaymentSuccess,
                 PaymentResult.PaymentFailure,
                 PaymentResult.PaymentPending {
 
-    /** Charge captured; {@code transactionId} identifies it for later refunds. */
+    /** Cobro capturado; transactionId lo identifica para reembolsos posteriores. */
     record PaymentSuccess(String transactionId, BigDecimal amount) implements PaymentResult {}
 
-    /** Operation rejected by the provider. {@code reason} is for logs, not raw user display. */
+    /** Operación rechazada por el proveedor; reason es para logs, no para mostrar al usuario. */
     record PaymentFailure(String reason) implements PaymentResult {}
 
-    /** Accepted but not settled yet (e.g. async voucher); resolved by a later status check. */
+    /** Aceptado pero aún no liquidado; se resuelve con una consulta de estado posterior. */
     record PaymentPending(String reference) implements PaymentResult {}
 }

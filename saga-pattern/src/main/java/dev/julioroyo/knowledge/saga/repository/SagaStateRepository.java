@@ -10,12 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 /**
- * In-memory stand-in for the durable store that a real saga relies on.
- *
- * <p>The persistence itself is deliberately trivial (an append-only list) — the
- * point of the demo is <em>that</em> every transition is recorded, not how it is
- * stored. In production this would be a transactional table written in the same
- * local transaction as each step's business effect.
+ * Sustituto en memoria del almacén durable en el que se apoya una saga real.
+ * Aquí es una lista de solo anexado; lo relevante es que cada transición quede
+ * registrada.
  */
 @Repository
 public class SagaStateRepository {
@@ -29,7 +26,7 @@ public class SagaStateRepository {
         log.debug("Saga {} step '{}' -> {}", sagaId, stepName, status);
     }
 
-    /** Full ordered transition history for one saga, useful for auditing or resume. */
+    /** Historial de transiciones completo y ordenado de una saga, útil para auditar o reanudar. */
     public List<SagaStepRecord> history(String sagaId) {
         return records.stream()
                 .filter(record -> record.sagaId().equals(sagaId))

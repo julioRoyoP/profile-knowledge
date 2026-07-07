@@ -1,5 +1,6 @@
 package dev.julioroyo.knowledge.security.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,37 +10,34 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Spring Security as an OAuth2 <em>Resource Server</em>: the backend validates
- * JWTs issued by an external identity provider (Keycloak) and authorizes by
- * role. It never sees passwords and keeps no session — every request carries its
- * own bearer token.
- *
- * <p>The issuer/JWK URIs live in configuration (e.g.
- * {@code spring.security.oauth2.resourceserver.jwt.issuer-uri:
- * https://<idp-host>/realms/demo-realm}); no real URL is hardcoded here.
+ * Configura Spring Security como OAuth2 Resource Server: el backend valida los
+ * JWT emitidos por un IdP externo (Keycloak) y autoriza por rol, sin gestionar
+ * contraseñas ni sesiones. Cada petición llega con su propio bearer token. El
+ * issuer y el JWK viven en configuración externa, nunca hardcodeados.
  */
+@Slf4j
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("Configurando Resource Server OAuth2 (stateless, autorización por rol)");
         http
-            // Stateless: no server session, CSRF protection is unnecessary for a
-            // token-authenticated API.
+            // Sin estado: no hay sesión de servidor, así que la protección CSRF sobra.
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public, read-only catalog browsing.
+                // Catálogo público de solo lectura.
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                // Health/info probes open to the platform.
+                // Sondas de salud/info abiertas a la plataforma.
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                // Writing to the catalog requires an admin.
+                // Escribir en el catálogo requiere administrador.
                 .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
-                // The admin area is admin-only across all methods.
+                // El área de admin es solo de administradores en cualquier método.
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // Everything else just needs a valid, authenticated token.
+                // El resto solo exige un token válido y autenticado.
                 .anyRequest().authenticated())
-            // Resource server: validate the JWT and map its roles to authorities.
+            // Resource server: valida el JWT y mapea sus roles a authorities.
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtRoleConverter())));
 

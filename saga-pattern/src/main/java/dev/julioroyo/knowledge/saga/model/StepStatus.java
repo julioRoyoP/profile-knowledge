@@ -1,11 +1,9 @@
 package dev.julioroyo.knowledge.saga.model;
 
 /**
- * Lifecycle of a single saga step, as persisted by the saga state repository.
- *
- * <p>Keeping a durable trail of these transitions is what lets a real saga be
- * resumed or audited after a crash: on restart you know exactly which steps
- * completed and therefore which compensations still owe to run.
+ * Ciclo de vida de un único paso de saga, tal como lo persiste el repositorio de
+ * estado. El rastro durable de estas transiciones permite auditar o reanudar la
+ * saga tras una caída.
  */
 public enum StepStatus {
     STARTED,

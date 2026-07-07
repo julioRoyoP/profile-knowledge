@@ -1,9 +1,9 @@
 package dev.julioroyo.knowledge.saga.exception;
 
 /**
- * Thrown by the saga orchestrator after a step failed <em>and</em> the
- * already-executed steps have been compensated. It signals to the caller that
- * the whole saga was rolled back, naming the step that triggered it.
+ * La lanza el orquestador después de que un paso falle y los pasos ya ejecutados
+ * hayan sido compensados. Señala que toda la saga se revirtió, nombrando el paso
+ * que lo provocó.
  */
 public class SagaExecutionException extends RuntimeException {
 

@@ -3,8 +3,8 @@ package dev.julioroyo.knowledge.saga.model;
 import java.math.BigDecimal;
 
 /**
- * Minimal order aggregate. A real system would carry line items, customer,
- * shipping address, etc.; here we keep only what the saga needs to illustrate
- * the flow.
+ * Agregado de pedido mínimo. Un sistema real llevaría líneas de pedido, cliente,
+ * dirección de envío, etc.; aquí conservamos solo lo que la saga necesita para
+ * ilustrar el flujo.
  */
 public record Order(String id, BigDecimal amount) {}

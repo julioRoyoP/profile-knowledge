@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Proyecto Maven independiente para la demo outbox-pattern. Cada demo de este
+      repositorio es autónoma (sin pom padre compartido) para poder compilarse y
+      ejecutarse por sí sola, como un microservicio independiente.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>dev.julioroyo.knowledge</groupId>
+    <artifactId>outbox-pattern</artifactId>
+    <version>1.0.0</version>
+    <name>outbox-pattern</name>
+    <description>Asynchronous side effects with eventual consistency (Outbox pattern)</description>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Contexto core de Spring (@Service, @Component, @Repository,
+             @Scheduled, @Async, @Transactional) más el puente de logging del
+             starter (SLF4J API + Logback). Sin starters web/data: es una demo de
+             consola. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Aporta @Transactional (org.springframework.transaction). No lo trae
+             el starter básico y OrderConfirmationService lo usa para marcar que
+             el evento outbox se escribe en la misma transacción de negocio. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+
+        <!-- Lombok: @Slf4j (logger) y @Getter (accessors). Config fluent en
+             lombok.config para que @Getter genere `id()` en vez de `getId()`,
+             conservando el estilo de accessors del código. Requiere annotation
+             processing activado (Maven lo hace solo; en el IDE hay que habilitarlo). -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Aporta JUnit 5, Mockito (+ mockito-junit-jupiter) y AssertJ, de los
+             que depende el OutboxDispatcherTest existente. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Habilita `mvn spring-boot:run` para lanzar la demo. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

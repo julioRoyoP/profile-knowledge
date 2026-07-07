@@ -10,13 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 
 /**
- * In-memory stand-in for the outbox table.
- *
- * <p>In a real database, claiming due events would be a single atomic statement
- * such as {@code UPDATE outbox SET status='PROCESSING' WHERE status='PENDING'
- * AND next_attempt_at <= now() ... FOR UPDATE SKIP LOCKED} so that concurrent
- * relay instances never grab the same row. Here the claim is split into "read
- * due" + "mark processing" by the relay, which is enough to show the intent.
+ * Sustituto en memoria de la tabla outbox. En producción, reclamar los eventos
+ * vencidos sería una sentencia atómica (UPDATE ... FOR UPDATE SKIP LOCKED) para que
+ * instancias concurrentes del relay no tomen la misma fila.
  */
 @Repository
 public class OutboxRepository {
@@ -28,7 +24,7 @@ public class OutboxRepository {
         return event;
     }
 
-    /** Pending events whose backoff window has elapsed, oldest first. */
+    /** Eventos pendientes cuya ventana de backoff ya ha vencido, del más antiguo al más reciente. */
     public List<OutboxEvent> findDue(Instant now, int limit) {
         return events.values().stream()
                 .filter(event -> event.status() == OutboxStatus.PENDING)
@@ -36,5 +32,10 @@ public class OutboxRepository {
                 .sorted(Comparator.comparing(OutboxEvent::nextAttemptAt))
                 .limit(limit)
                 .toList();
+    }
+
+    /** Todos los eventos almacenados; útil para inspeccionar el estado en la demo. */
+    public List<OutboxEvent> findAll() {
+        return List.copyOf(events.values());
     }
 }

@@ -3,27 +3,21 @@ package dev.julioroyo.knowledge.payment.service;
 import dev.julioroyo.knowledge.payment.model.PaymentRequest;
 import dev.julioroyo.knowledge.payment.model.PaymentResult;
 import dev.julioroyo.knowledge.payment.model.PaymentResult.PaymentSuccess;
+import java.math.BigDecimal;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Example provider implementation.
- *
- * <p>The bean name {@code "stripe"} is also the {@link #provider()} key, so it
- * lands under that key in the {@code Map<String, PaymentGateway>} Spring injects
- * into {@link PaymentService}.
- *
- * <p>The external call is <em>simulated</em> on purpose: no real Stripe SDK, so
- * the file stays self-contained. The shape — build a provider request, call out,
- * map the provider response back to the agnostic {@link PaymentResult} — mirrors
- * how a real integration is structured.
+ * Implementación de proveedor de ejemplo. El nombre del bean "stripe" es
+ * también su clave provider(), así que Spring lo inyecta bajo esa clave en el
+ * Map<String, PaymentGateway> que consume PaymentService. La llamada externa
+ * está simulada: no usa el SDK real, pero mantiene la forma de una integración
+ * (construir petición, llamar, mapear la respuesta a PaymentResult).
  */
+@Slf4j
 @Component("stripe")
 public class StripePaymentGateway implements PaymentGateway {
-
-    private static final Logger log = LoggerFactory.getLogger(StripePaymentGateway.class);
 
     @Override
     public String provider() {
@@ -32,7 +26,6 @@ public class StripePaymentGateway implements PaymentGateway {
 
     @Override
     public PaymentResult processPayment(PaymentRequest request) {
-        // Real impl: stripeClient.charges().create(...) and map the response.
         log.info("[stripe] charging {} {} for order {}",
                 request.amount(), request.currency(), request.orderId());
         return new PaymentSuccess("ch_" + UUID.randomUUID(), request.amount());
@@ -41,12 +34,13 @@ public class StripePaymentGateway implements PaymentGateway {
     @Override
     public PaymentResult refundPayment(String transactionId) {
         log.info("[stripe] refunding {}", transactionId);
-        return new PaymentSuccess(transactionId, null);
+        // Demo: solo simula éxito. El importe real no se conoce aquí; se usa ZERO.
+        return new PaymentSuccess(transactionId, BigDecimal.ZERO);
     }
 
     @Override
     public PaymentResult getPaymentStatus(String transactionId) {
         log.info("[stripe] status of {}", transactionId);
-        return new PaymentSuccess(transactionId, null);
+        return new PaymentSuccess(transactionId, BigDecimal.ZERO);
     }
 }
